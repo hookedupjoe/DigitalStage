@@ -74,6 +74,15 @@ window.ThisPageNow = ThisPage;
 
                 var spotifyAccessToken = sessionStorage.getItem("spotifyAccessToken") || '';
                 var codeBackCode = sessionStorage.getItem("codebackcode") || '';
+                const params = new URLSearchParams(window.location.search);
+                const code = params.get("code");
+                if(code){
+                    sessionStorage.setItem("codebackcode",code);
+                    window.location = window.location.origin + window.location.pathname;
+                }
+
+
+
                 var spotifyAccessTokenRefresh = sessionStorage.getItem("spotifyAccessTokenRefresh") || '';
 
                 //--- ToDo: Use iframe to prompt to get token again?
@@ -126,7 +135,7 @@ window.ThisPageNow = ThisPage;
 
     //------- --------  --------  --------  --------  --------  --------  -------- 
     //~YourPageCode//~
-var clientId = localStorage.getItem('_spotify_controller_client_id') || '';
+var clientId = localStorage.getItem('_spotify_client_id_DigitalPuppet') || '';
 
     //var params = new URLSearchParams(window.location.search);
     // async function getAccessToken(theClientId, theCode) {
@@ -168,7 +177,7 @@ var clientId = localStorage.getItem('_spotify_controller_client_id') || '';
         params.append("client_id", theClientId);
         params.append("grant_type", "authorization_code");
         params.append("code", theCode);
-        params.append("redirect_uri", "http://localhost:33480/codeback");
+        params.append("redirect_uri", "http://localhost:33480/DigitalStage/");
         params.append("code_verifier", verifier);
 
 
@@ -210,7 +219,7 @@ var clientId = localStorage.getItem('_spotify_controller_client_id') || '';
         const params = new URLSearchParams();
         params.append("client_id", clientId);
         params.append("response_type", "code");
-        params.append("redirect_uri", "http://localhost:33480/codeback");
+        params.append("redirect_uri", "http://localhost:33480/DigitalStage/");
         params.append("scope", "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing");
         params.append("code_challenge_method", "S256");
         params.append("code_challenge", challenge);
@@ -246,7 +255,7 @@ var clientId = localStorage.getItem('_spotify_controller_client_id') || '';
     actions.setClientID = function () {
         ThisApp.input('Enter the Client ID', 'Spotify App Client ID', 'Save Client ID', '').then(function (theTextValue) {
             if (theTextValue) {
-                localStorage.setItem('_spotify_controller_client_id', theTextValue);
+                localStorage.setItem('_spotify_client_id_DigitalPuppet', theTextValue);
                 window.location = window.location;
             }
 
