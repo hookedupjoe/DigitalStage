@@ -85,6 +85,7 @@ window.ThisPageNow = ThisPage;
 
                 var spotifyAccessTokenRefresh = sessionStorage.getItem("spotifyAccessTokenRefresh") || '';
 
+                //--- ToDo: 
                 //--- ToDo: Use iframe to prompt to get token again?
                 //--- ToDo: Timer to refresh token if app still open, before the expire time
                 // ActionAppCore.apiFailAction = function(){
@@ -135,8 +136,12 @@ window.ThisPageNow = ThisPage;
 
     //------- --------  --------  --------  --------  --------  --------  -------- 
     //~YourPageCode//~
+
+//--- Get Client ID via prompt    
 var clientId = localStorage.getItem('_spotify_client_id_DigitalPuppet') || '';
-var callbackURL = 'https://hookedupjoe.github.io/DigitalStageLive/';
+//--- Going to tell the login process to return to this page with the code
+//      we will use that code directly to authenticate and get token 
+var callbackURL = window.location.origin + window.location.pathname;
     //var params = new URLSearchParams(window.location.search);
     // async function getAccessToken(theClientId, theCode) {
     //     const verifier = localStorage.getItem("verifier");
@@ -220,7 +225,7 @@ var callbackURL = 'https://hookedupjoe.github.io/DigitalStageLive/';
         params.append("client_id", clientId);
         params.append("response_type", "code");
         params.append("redirect_uri", callbackURL);
-        params.append("scope", "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing");
+        params.append("scope", "user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-currently-playing streaming");
         params.append("code_challenge_method", "S256");
         params.append("code_challenge", challenge);
 
@@ -267,7 +272,7 @@ var callbackURL = 'https://hookedupjoe.github.io/DigitalStageLive/';
         if (theStatus == 'ready') {
             refreshDeviceList();
         }
-        ThisPage.showSubPage({ group: 'statustabs', item: theStatus })
+        ThisApp.showSubPage({ group: 'statustabs', item: theStatus })
     }
 
     function apiReplyGood(theResponse) {
@@ -300,18 +305,29 @@ var callbackURL = 'https://hookedupjoe.github.io/DigitalStageLive/';
 
     const SPOTIFY_API_BASE_URL = 'https://api.spotify.com/v1/me';
 
+    ActionAppCore.apiFailAction = refreshToken;
+
     ThisPage.refreshToken = refreshToken;
     function refreshToken() {
-        this.refreshTokenCall().then(function (theInfo) {
-            if (theInfo && theInfo.access_token) {
-                ActionAppCore.spotifyToken = theInfo.access_token;
-                sessionStorage.setItem("spotifyAccessToken", ActionAppCore.spotifyToken)
-            }
-            if (theInfo && theInfo.refresh_token) {
-                ActionAppCore.spotifyTokenRefresh = theInfo.refresh_token;
-                sessionStorage.setItem("spotifyAccessTokenRefresh", ActionAppCore.spotifyTokenRefresh)
-            }
-        })
+        var dfd = jQuery.Deferred();
+
+        try {
+            this.refreshTokenCall().then(function (theInfo) {
+                if (theInfo && theInfo.access_token) {
+                    ActionAppCore.spotifyToken = theInfo.access_token;
+                    sessionStorage.setItem("spotifyAccessToken", ActionAppCore.spotifyToken)
+                }
+                if (theInfo && theInfo.refresh_token) {
+                    ActionAppCore.spotifyTokenRefresh = theInfo.refresh_token;
+                    sessionStorage.setItem("spotifyAccessTokenRefresh", ActionAppCore.spotifyTokenRefresh)
+                }
+                dfd.resolve(theInfo);
+            })
+        } catch (error) {
+            dfd.reject(error)
+        }
+
+        return dfd.promise();
     }
 
     ThisPage.refreshTokenCall = refreshTokenCall;
