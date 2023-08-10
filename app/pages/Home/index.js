@@ -42,6 +42,7 @@ thisPageSpecs.required = {
 
     var actions = ThisPage.pageActions;
 
+
     ThisPage._onPreInit = function (theApp) {
         //~_onPreInit//~
 
@@ -67,6 +68,17 @@ window.ThisPageNow = ThisPage;
                 if (ActionAppCore.spotifyToken) {
                     showStatus('ready')
                 } else if (clientId) {
+
+                    if( ActionAppCore.spotifySDKReady ){
+                      ActionAppCore.spotifyPlayer = new Spotify.Player({
+                        name: ActionAppCore.spotifyDeviceName,
+                        getOAuthToken: cb => { cb(ActionAppCore.spotifyToken); },
+                        volume: 0.5
+                      })
+                      
+                    } else {
+                      console.log("ActionAppCore.spotifySDKReady not set")
+                    }
                     showStatus('setup')
                 } else {
                     showStatus('new')
@@ -136,9 +148,12 @@ window.ThisPageNow = ThisPage;
 
     //------- --------  --------  --------  --------  --------  --------  -------- 
     //~YourPageCode//~
-
 //--- Get Client ID via prompt    
 var clientId = localStorage.getItem('_spotify_client_id_DigitalPuppet') || '';
+
+ActionAppCore.spotifyDeviceName = 'Spotify API Playground'
+ActionAppCore.spotifyPlayerConnected = false
+
 //--- Going to tell the login process to return to this page with the code
 //      we will use that code directly to authenticate and get token 
 var callbackURL = window.location.origin + window.location.pathname;
@@ -253,18 +268,25 @@ var callbackURL = window.location.origin + window.location.pathname;
 
 
     //======================================
-
-
-
-
     actions.setClientID = function () {
         ThisApp.input('Enter the Client ID', 'Spotify App Client ID', 'Save Client ID', '').then(function (theTextValue) {
             if (theTextValue) {
                 localStorage.setItem('_spotify_client_id_DigitalPuppet', theTextValue);
                 window.location = window.location;
             }
-
         });
+    }
+    
+    actions.connectPlayer = connectPlayer;
+    function connectPlayer(){
+        ActionAppCore.spotifyPlayer.connect();
+        //-- ToDo: Get connected message and use that
+        ThisApp.delay(3000).then(() => {refreshDeviceList()})
+    }
+
+    actions.togglePlayer = togglePlayer;
+    function togglePlayer(){
+        ActionAppCore.spotifyPlayer.togglePlay();
     }
 
     actions.showStatus = showStatus;
@@ -400,18 +422,12 @@ var callbackURL = window.location.origin + window.location.pathname;
 
     
 
-    actions.playAlbum = function () {
-        var tmpDetails = {
-            "context_uri": "spotify:album:5ht7ItJgpBH7W6vJ5BqpPr",
-            "offset": {
-                "position": 5
-            },
-            "position_ms": 0
-        }
-        return spotifyPut('/player/play', 'Play Button Clicked', tmpDetails)
-    }
     actions.hitPlay = function () {
-        return spotifyPut('/player/play', 'Play Button Clicked')
+        var tmpParams = '';
+        if( ThisPage.common.activeDeviceId){
+            tmpParams = '/?device_id=' + ThisPage.common.activeDeviceId;
+        }
+        return spotifyPut('/player/play'+tmpParams, 'Play Button Clicked')
     }
     actions.hitPause = function () {
         return spotifyPut('/player/pause', 'Pause Button Clicked')
@@ -429,6 +445,19 @@ var callbackURL = window.location.origin + window.location.pathname;
         return ThisPage.spotifyGet('/player', '');
     }
 
+    function showPlayerConnected(theIsConnected){
+        var tmpIs = ThisPage.getByAttr$({pageuse:"PlayerConnected"});
+        var tmpIsNot = ThisPage.getByAttr$({pageuse:"PlayerNotConnected"});
+
+        if( theIsConnected ){
+            tmpIs.removeClass('hidden');
+            tmpIsNot.addClass('hidden');
+        } else {
+            tmpIs.addClass('hidden');
+            tmpIsNot.removeClass('hidden');
+        }
+    }
+
     ThisPage.getDevices = getDevices;
     function getDevices() {
         return ThisPage.spotifyGet('/player/devices', '');
@@ -438,8 +467,14 @@ var callbackURL = window.location.origin + window.location.pathname;
     function refreshDeviceList() {
         var dfd = jQuery.Deferred();
         var tmpHTML = [];
-        console.log('refreshDeviceList')
+        //console.log('refreshDeviceList')
+        
+
+        
         getDevices().then(function (theReply) {
+            var tmpIsConnected = false;
+            var tmpAnyIsActive = false;
+            var tmpThisIsActive = false;
             if (theReply && theReply.devices) {
                 tmpHTML.push('<div class="ui fluid vertical menu">');
                 for (var iPos in theReply.devices) {
@@ -447,16 +482,32 @@ var callbackURL = window.location.origin + window.location.pathname;
                     ThisPage.common.devices = theReply.devices;
 
                     if (tmpDevice) {
+                        var tmpIsMe = tmpDevice.name == ActionAppCore.spotifyDeviceName;
                         tmpHTML.push('<a did="' + tmpDevice.id + '" pageaction="setDefaultDevice" class="active blue item">');
                         tmpHTML.push(tmpDevice.name);
+                        console.log( 'tmpDevice.name', tmpDevice.name);
+                        if( tmpDevice.name == ActionAppCore.spotifyDeviceName){
+                            tmpIsConnected = true;
+                        }
+
+                        console.log( 'tmpIsConnected', tmpIsConnected);
+                        var tmpMiddle = '&nbsp;&nbsp;&nbsp;';
+                        if( tmpIsMe ){
+                            tmpThisIsActive = true;
+                            tmpMiddle = '&nbsp;*&nbsp;';
+                        }
 
                         if (tmpDevice.is_active === true) {
+                            tmpAnyIsActive = true;
+                            if( tmpIsMe ){
+                                tmpThisIsActive = true;
+                            }
                             tmpHTML.push('  <div class="ui orange left pointing label">');
-                            tmpHTML.push('&nbsp;');
+                            tmpHTML.push(tmpMiddle);
                             tmpHTML.push('  </div>');
                         } else {
                             tmpHTML.push('  <div class="ui left label">');
-                            tmpHTML.push('&nbsp;');
+                            tmpHTML.push(tmpMiddle);
                             tmpHTML.push('  </div>');
                         }
                         tmpHTML.push('</a>');
@@ -465,6 +516,9 @@ var callbackURL = window.location.origin + window.location.pathname;
                         tmpHTML.push('<div class="item">No Devices Available</div>');
                     }
                 }
+                ActionAppCore.spotifyPlayerConnected = tmpIsConnected;
+                ActionAppCore.spotifyPlayerActive = tmpThisIsActive;
+                showPlayerConnected(ActionAppCore.spotifyPlayerConnected);
                 ThisPage.loadSpot('show-devices', tmpHTML.join('\n'));
             }
             dfd.resolve(theReply.devices);

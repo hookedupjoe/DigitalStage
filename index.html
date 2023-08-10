@@ -11,8 +11,6 @@
 
   <link rel="stylesheet" href="/built-lib/support-libs.css">
   <link rel="stylesheet" href="/lib/semantic/dist/semantic.min.css">
-  <link rel="stylesheet" href="/lib/tabulator/css/tabulator.min.css">
-  <link rel="stylesheet" href="/lib/tabulator/css/semantic-ui/tabulator_semantic-ui.min.css">
 
   
 
@@ -57,18 +55,13 @@
   <script src="/lib/semantic/dist/semantic.min.js"></script>
 
   <!-- Mongino and Required Items -->
-  <script src="/lib/actionapp/actionapp.js?open&v=1204191338"></script>
+  <script src="/lib/actionapp/actionapp.js?open"></script>
   
   <!-- For locally in-server deployed only -->
   
 
   <script src="/lib/actionapp/nosql-data-manager.js"></script>
   <script src="/lib/actionapp/object-manager-plugin.js"></script>
-
-  <script src="/lib/tabulator/js/tabulator.min.js"></script>
-  <script src="/lib/tabulator/addons/moment.2.24.js"></script>
-  <script src="/lib/tabulator/addons/xlsx.full.min.js"></script>
-
 
   <!-- ToDo Move / Unify -->
   <script type="importmap">
@@ -83,7 +76,14 @@
   
 
   <!-- OPTIONAL - JS Libraries -->
-  
+  <script src="https://sdk.scdn.co/spotify-player.js"></script>
+  <script>
+    window.onSpotifyWebPlaybackSDKReady = function(){
+      ActionAppCore.spotifySDKReady = true;
+      ActionAppCore.publish("spotifySDKReady");
+    }
+  </script>
+
   
   <!-- Application - Modules, etc -->
   <script src="/lib/actionapp/app-module.js"></script>
