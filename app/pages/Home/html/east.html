@@ -1,44 +1,52 @@
 <div class="ui segment basic slim">
   <div class="ui form">
     <div item="pagetabs" class="mar0 pad0 ui top attached tabular menu ">
-      <a appuse="tablinks" group="maintabs" item="devices" pageaction="showSubPage" class="item blue active ">Devices</a>
-      <a appuse="tablinks" group="maintabs" item="favs" pageaction="showSubPage" class="item blue">The Console</a>
+      <a appuse="tablinks" group="maintabs" item="devices" pageaction="showSubPage" class="item blue active ">Actors</a>
+      <a appuse="tablinks" group="maintabs" item="favs" pageaction="showSubPage" class="item blue">Dressing Room</a>
     </div>
     <div class=" ui  bottom attached slim blue segment   ">
       <div tab="" appuse="cards" group="maintabs" item="devices" class="pad0 ">
         <div class="ui message medium blue">
-          Spotify Device Name: <b>Spotify API Playground</b>
+          Your Name: <b>Anonymous Bob</b>
+          
+          <div class="pad5"></div>
+            
+              <div class="ui button blue small compact" pageaction="setYourName">
+      Change Your Name
+    </div>
+    
+    
         </div>
+        
         <div pageuse="PlayerNotConnected" class="ui message medium yellow">
-          <b>Player not connected</b>
+          <b>Actor is outside looking in a window.  Come on in.</b>
           <div class="pad3" ></div>
-        <div class="ui button yellow compact small" pageaction="connectPlayer"><i class="icon music"></i> Connect Player</div>  
+        <div class="ui button yellow compact small" pageaction="connectPlayer">Go Backstage <i class="icon right chevron"></i></div>  
         </div>
 
-        <div pageuse="PlayerConnected" class="ui message medium green hidden">
-          <b>Player is connected</b>
+        <div pageuse="PlayerConnected" class="ui message medium green xhidden">
+          <b>Actor is backstage</b>
                     <div class="pad3" ></div>
-                    Next step, make this player the active player.
+                    Next step, find a character to control.
                     <div class="pad3" ></div>
-        <div class="ui button green compact small" pageaction="togglePlayer">Toggle Player</div>
+        <div class="ui button green compact small" pageaction="togglePlayer">Select a character  <i class="icon right chevron"></i></div>
         </div>
         
 
         <div class="ui header medium blue center aligned">
-          Available Devices
+          All Actors
         </div>
         
-        <div class="ui button blue basic compact small" pageaction="refreshDeviceList"><i class="icon recycle"></i> Refresh Devices</div>
-        <div class="ui button blue basic compact small" pageaction="refreshToken"><i class="icon key"></i> Refresh Token</div>
+        <div class="ui button blue basic compact small" pageaction="refreshDeviceList"><i class="icon recycle"></i> Refresh</div>
         <div class="pad5"></div>
-        <div pagespot="show-devices">
+        <div pagespot="show-actors">
         </div>
       </div>
       <div tab="" appuse="cards" group="maintabs" item="favs" class="pad0  hidden ">
         <div class="ui header medium blue">
-          With the Token you will have complete access to the APIs via the console.
+          Hey!
         </div>
-        <div pagespot="show-console-options"></div>
+        <div pagespot="dressing-room"></div>
       </div>
     </div>
   </div>
