@@ -17,13 +17,13 @@ var thisPageSpecs = {
 
     //~layoutOptions//~
 thisPageSpecs.layoutOptions = {
-        baseURL: pageBaseURL,
-        north: false,
-        east: { html: "east" },
-        west: false,
-        center: { html: "center" },
-        south: false
-    }
+    baseURL: pageBaseURL,
+    north: false,
+    east: { name: "welcome", control: "WelcomeCenter", "source": "__app" },
+    west: false,
+    center: { html: "center" },
+    south: false
+}
 //~layoutOptions~//~
 
     //~layoutConfig//~
@@ -64,6 +64,8 @@ thisPageSpecs.required = {
                 //~_onFirstLoad//~
 window.ThisPageNow = ThisPage;
 
+ThisPage.parts.welcome.subscribe('sendChat', onSendChat)
+
 ThisPage.chatInput = ThisPage.getByAttr$({pageuse:"chatinput"})
 
 ThisPage.stage = {
@@ -74,7 +76,7 @@ ThisPage.stage = {
   }
 }
 
-console.log('ThisPage.stage.userid',ThisPage.stage.userid);
+//console.log('ThisPage.stage.userid',ThisPage.stage.userid);
 
 
 var tmpURL = ActionAppCore.util.getWebsocketURL('actions', 'ws-stage');
@@ -113,88 +115,93 @@ refreshUI();
 
     //------- --------  --------  --------  --------  --------  --------  -------- 
     //~YourPageCode//~
-function refreshUI(){
+function refreshUI() {
   ThisPage.loadSpot('your-disp-name', ThisPage.stage.profile.name);
   var tmpName = ThisPage.stage.profile.name;
   var tmpProfileStatus = 'new';
-  if( tmpName ){
+  if (tmpName) {
     tmpProfileStatus = 'outside';
   }
-  if( ThisPage.stage.people && ThisPage.stage.people[ThisPage.stage.userid]){
+  if (ThisPage.stage.people && ThisPage.stage.people[ThisPage.stage.userid]) {
     tmpProfileStatus = 'backstage';
   }
-  
-  ThisPage.showSubPage({item:tmpProfileStatus, group: 'profilestatus'});
-  
+
+  ThisPage.showSubPage({
+    item: tmpProfileStatus, group: 'profilestatus'
+  });
+
 }
 
 actions.sendProfile = sendProfile;
-function sendProfile(){
-    ThisPage.wsclient.send(JSON.stringify({action:'profile', profile: ThisPage.stage.profile, userid: ThisPage.stage.userid, id: ThisPage.stage.stageid}))
+function sendProfile() {
+  ThisPage.wsclient.send(JSON.stringify({
+    action: 'profile', profile: ThisPage.stage.profile, userid: ThisPage.stage.userid, id: ThisPage.stage.stageid
+  }))
 }
 
 actions.refreshPeople = refreshPeople;
-function refreshPeople(thePeople){
-    ThisPage.stage.people = thePeople;
-    var tmpHTML = [];
-    var tmpActive = false;
-    for( var aID in thePeople ){
-        var tmpPerson = thePeople[aID];
-        if( aID == ThisPage.stage.userid ){
-            tmpActive = true;
-            tmpHTML.push('* ');    
-        }
-        tmpHTML.push(tmpPerson.name + '<hr />');
+function refreshPeople(thePeople) {
+  ThisPage.stage.people = thePeople;
+  var tmpHTML = [];
+  var tmpActive = false;
+  for (var aID in thePeople) {
+    var tmpPerson = thePeople[aID];
+    if (aID == ThisPage.stage.userid) {
+      tmpActive = true;
+      tmpHTML.push('* ');
     }
-    ThisPage.loadSpot('people-list',tmpHTML.join('\n'));
-    refreshUI();
+    tmpHTML.push(tmpPerson.name + '<hr />');
+  }
+  ThisPage.loadSpot('people-list', tmpHTML.join('\n'));
+  refreshUI();
 }
 
-function processMessage(theMsg){
-    if( typeof(theMsg) == 'string' && theMsg.startsWith('{')){
-        theMsg = JSON.parse(theMsg);
-    }
-    if( typeof(theMsg) != 'object'){
-        return;
-    }
-    console.log('got',theMsg);
-    var tmpAction = theMsg.action || theMsg.people ;
-    if( !(tmpAction)){
-        console.log('no action to take',theMsg);
-        return;
-    }
-    
-    if( tmpAction == 'welcome' && theMsg.id ){
-        ThisPage.stage.stageid = theMsg.id;        
-        if( !(ThisPage.stage.userid) ){
-            ThisPage.stage.userid = theMsg.userid;
-            sessionStorage.setItem('userid', ThisPage.stage.userid)
-        } else {
-            //--- We already have a profile, send userid we have
-            if( ThisPage.stage.profile.name && ThisPage.stage.userid){
-                sendProfile();
-            }
-            //ThisPage.wsclient.send({action:'profile',}) 
-        }
-        console.log('ThisPage.stage.stageid',ThisPage.stage.stageid);
-        
-    } else if( tmpAction == 'chat' && theMsg.chat ){
-        
-        console.log('chat',theMsg);
-        var tmpHTML = [];
-        tmpHTML.push('<div class="ui message">')
-        tmpHTML.push('<b>' + theMsg.fromname + '</b><br />')
-        tmpHTML.push('' + theMsg.chat.text)
-        tmpHTML.push('</div">')
-        ThisPage.addToSpot('chatoutput', tmpHTML.join('\n'))
-        
-    }
-    if( theMsg.people ){
-        console.log('theMsg.people',theMsg.people);
+function processMessage(theMsg) {
+  if (typeof(theMsg) == 'string' && theMsg.startsWith('{')) {
+    theMsg = JSON.parse(theMsg);
+  }
+  if (typeof(theMsg) != 'object') {
+    return;
+  }
+  //console.log('got', theMsg);
+  var tmpAction = theMsg.action || theMsg.people;
+  if (!(tmpAction)) {
+    console.log('no action to take', theMsg);
+    return;
+  }
 
-        refreshPeople(theMsg.people);
+  if (tmpAction == 'welcome' && theMsg.id) {
+    ThisPage.stage.stageid = theMsg.id;
+    if (!(ThisPage.stage.userid)) {
+      ThisPage.stage.userid = theMsg.userid;
+      sessionStorage.setItem('userid', ThisPage.stage.userid)
+    } else {
+      //--- We already have a profile, send userid we have
+      if (ThisPage.stage.profile.name && ThisPage.stage.userid) {
+        sendProfile();
+      }
+      //ThisPage.wsclient.send({action:'profile',})
     }
-    
+    //console.log('ThisPage.stage.stageid', ThisPage.stage.stageid);
+
+  } else if (tmpAction == 'chat' && theMsg.chat) {
+
+    ThisPage.parts.welcome.gotChat(theMsg);
+    // console.log('chat', theMsg);
+    // var tmpHTML = [];
+    // tmpHTML.push('<div class="ui message">')
+    // tmpHTML.push('<b>' + theMsg.fromname + '</b><br />')
+    // tmpHTML.push('' + theMsg.chat.text)
+    // tmpHTML.push('</div">')
+    // ThisPage.addToSpot('chatoutput', tmpHTML.join('\n'))
+
+  }
+  if (theMsg.people) {
+    //console.log('theMsg.people', theMsg.people);
+
+    refreshPeople(theMsg.people);
+  }
+
 }
 function setProfileName(theName) {
   if (!(theName)) return;
@@ -204,25 +211,39 @@ function setProfileName(theName) {
   refreshUI();
 }
 
-actions.sendChat = function() {
-    var tmpChat = ThisPage.chatInput.val();
-    if( !(tmpChat)){
-        alert('Nothing to send', "Enter some text", "e").then(function(){
-            ThisPage.chatInput.focus();
-            return;
-        })
-    }
-    ThisPage.wsclient.send(JSON.stringify({action:'chat', chat: {text:tmpChat}}))
+function onSendChat(theEvent, theEl, theValue) {
+  //console.log("Page got chat", theValue)
+  if (!(theValue)) {
+    alert('Nothing to send', "Enter some text", "e").then(function() {
+      return;
+    })
+  }
+  ThisPage.wsclient.send(JSON.stringify({
+    action: 'chat', chat: {
+      text: theValue
+    }}))
 }
+
+
+// actions.sendChat = function() {
+//     var tmpChat = ThisPage.chatInput.val();
+//     if( !(tmpChat)){
+//         alert('Nothing to send', "Enter some text", "e").then(function(){
+//             ThisPage.chatInput.focus();
+//             return;
+//         })
+//     }
+//     ThisPage.wsclient.send(JSON.stringify({action:'chat', chat: {text:tmpChat}}))
+// }
 
 
 actions.clearChat = function() {
-    ThisPage.loadSpot('chatoutput', '');   
+  ThisPage.loadSpot('chatoutput', '');
 }
 
 actions.setYourName = function() {
-ThisApp.input('Enter your name','Any Display Name', 'Save Display Name', ThisPage.stage.profile.name).then(setProfileName);
+  ThisApp.input('Enter your name', 'Any Display Name', 'Save Display Name', ThisPage.stage.profile.name).then(setProfileName);
 }
-  //~YourPageCode~//~
+//~YourPageCode~//~
 
 })(ActionAppCore, $);

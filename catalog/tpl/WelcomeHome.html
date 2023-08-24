@@ -1,0 +1,55 @@
+
+        
+        <div appuse="cards" group="profilestatus" item="new" class="ui message medium blue">
+          Welcome, to join the fun, enter a display name and join in.
+          <div class="pad5"></div>
+          <div class="ui button blue small compact" pageaction="setYourName">
+            Set Display Name
+          </div>
+        </div>
+
+        <div appuse="cards" group="profilestatus" item="outside" class="hidden ui message medium">
+          <b>Welcome</b>
+          <div class="pad3"></div>
+          <div pagespot="your-disp-name" class="ui header medium black">
+            (none)
+          </div>
+          <div class="pad3"></div>
+          Welcome, you can can join the fun anytime.
+          <div class="pad3"></div>
+          <div class="ui button yellow compact small" pageaction="sendProfile">
+            Join the fun <i class="icon right chevron"></i>
+          </div>
+          <div class="pad3"></div>
+          <div class="ui button basic small compact" pageaction="setYourName">
+            Change Display Name
+          </div>
+        </div>
+
+        <div appuse="cards" group="profilestatus" item="backstage" class="hidden ui message medium green xhidden">
+          
+          <b><span pagespot="your-disp-name" class="ui bolder"></span>, you have joined the fun. To leave, close the browser tab.</b>
+          <div class="pad3"></div>
+          Next step would be to put on a costume and jump on stage, but all we have right now is chat to test joining the room and doing some basic interaction via chat.
+          <div class="pad3"></div>
+          <div class="hidden ui button green compact small" pageaction="togglePlayer">
+            Select a character  <i class="icon right chevron"></i>
+          </div>
+        </div>
+
+
+        <div class="ui header medium blue center aligned top attached">
+          Everyone that is here
+        </div>
+
+        <div class="ui segment attached hidden">
+          <div class="ui button blue basic compact small" pageaction="refreshPeople">
+            <i class="icon recycle"></i> Refresh
+          </div>
+        </div>
+        <div class="ui segment attached">
+          <div pagespot="people-list">
+            (no one is here)
+          </div>
+        </div>
+      
