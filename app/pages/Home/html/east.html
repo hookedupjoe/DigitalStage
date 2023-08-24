@@ -1,52 +1,69 @@
 <div class="ui segment basic slim">
   <div class="ui form">
     <div item="pagetabs" class="mar0 pad0 ui top attached tabular menu ">
-      <a appuse="tablinks" group="maintabs" item="devices" pageaction="showSubPage" class="item blue active ">Actors</a>
-      <a appuse="tablinks" group="maintabs" item="favs" pageaction="showSubPage" class="item blue">Dressing Room</a>
+      <a appuse="tablinks" group="maintabs" item="people" pageaction="showSubPage" class="item blue active ">People</a>
+      <a appuse="tablinks" group="maintabs" item="chat" pageaction="showSubPage" class="item blue">Chat</a>
     </div>
     <div class=" ui  bottom attached slim blue segment   ">
-      <div tab="" appuse="cards" group="maintabs" item="devices" class="pad0 ">
-        <div class="ui message medium blue">
-          Your Name: <b>Anonymous Bob</b>
-          
+      <div tab="" appuse="cards" group="maintabs" item="people" class="pad0 ">
+        
+        <div appuse="cards" group="profilestatus" item="new" class="ui message medium blue">
+          Welcome, to join the fun, enter a display name and join in.
           <div class="pad5"></div>
-            
-              <div class="ui button blue small compact" pageaction="setYourName">
-      Change Your Name
-    </div>
-    
-    
-        </div>
-        
-        <div pageuse="PlayerNotConnected" class="ui message medium yellow">
-          <b>Actor is outside looking in a window.  Come on in.</b>
-          <div class="pad3" ></div>
-        <div class="ui button yellow compact small" pageaction="connectPlayer">Go Backstage <i class="icon right chevron"></i></div>  
+          <div class="ui button blue small compact" pageaction="setYourName">
+            Set Display Name
+          </div>
         </div>
 
-        <div pageuse="PlayerConnected" class="ui message medium green xhidden">
+        <div appuse="cards" group="profilestatus" item="outside" class="hidden ui message medium">
+          <b>Welcome</b>
+          <div class="pad3"></div>
+          <div pagespot="your-disp-name" class="ui header medium black">
+            (none)
+          </div>
+          <div class="pad3"></div>
+          Welcome, you can can join the fun anytime.
+          <div class="pad3"></div>
+          <div class="ui button yellow compact small" pageaction="sendProfile">
+            Join the fun <i class="icon right chevron"></i>
+          </div>
+          <div class="pad3"></div>
+          <div class="ui button basic small compact" pageaction="setYourName">
+            Change Display Name
+          </div>
+        </div>
+
+        <div appuse="cards" group="profilestatus" item="backstage" class="hidden ui message medium green xhidden">
           <b>Actor is backstage</b>
-                    <div class="pad3" ></div>
-                    Next step, find a character to control.
-                    <div class="pad3" ></div>
-        <div class="ui button green compact small" pageaction="togglePlayer">Select a character  <i class="icon right chevron"></i></div>
+          <div class="pad3"></div>
+          Next step, find a character to control.
+          <div class="pad3"></div>
+          <div class="ui button green compact small" pageaction="togglePlayer">
+            Select a character  <i class="icon right chevron"></i>
+          </div>
         </div>
-        
 
-        <div class="ui header medium blue center aligned">
-          All Actors
+
+        <div class="ui header medium blue center aligned top attached">
+          Everyone that is here
         </div>
-        
-        <div class="ui button blue basic compact small" pageaction="refreshDeviceList"><i class="icon recycle"></i> Refresh</div>
-        <div class="pad5"></div>
-        <div pagespot="show-actors">
+
+        <div class="ui segment attached hidden">
+          <div class="ui button blue basic compact small" pageaction="refreshPeople">
+            <i class="icon recycle"></i> Refresh
+          </div>
+        </div>
+        <div class="ui segment attached">
+          <div pagespot="people-list">
+            (no one is here)
+          </div>
         </div>
       </div>
-      <div tab="" appuse="cards" group="maintabs" item="favs" class="pad0  hidden ">
+      <div tab="" appuse="cards" group="maintabs" item="chat" class="pad0  hidden ">
         <div class="ui header medium blue">
-          Hey!
+          General Chat
         </div>
-        <div pagespot="dressing-room"></div>
+        <div pagespot="gen-chat"></div>
       </div>
     </div>
   </div>
