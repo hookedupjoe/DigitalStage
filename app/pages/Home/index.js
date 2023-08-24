@@ -181,6 +181,12 @@ function processMessage(theMsg){
     } else if( tmpAction == 'chat' && theMsg.chat ){
         
         console.log('chat',theMsg);
+        var tmpHTML = [];
+        tmpHTML.push('<div class="ui message">')
+        tmpHTML.push('<b>' + theMsg.fromname + '</b><br />')
+        tmpHTML.push('' + theMsg.chat.text)
+        tmpHTML.push('</div">')
+        ThisPage.addToSpot('chatoutput', tmpHTML.join('\n'))
         
     }
     if( theMsg.people ){
