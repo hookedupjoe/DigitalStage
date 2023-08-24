@@ -64,7 +64,7 @@ thisPageSpecs.required = {
                 //~_onFirstLoad//~
 window.ThisPageNow = ThisPage;
 
-
+ThisPage.chatInput = ThisPage.getByAttr$({pageuse:"chatinput"})
 
 ThisPage.stage = {
   name: "The Fun Stage",
@@ -163,7 +163,7 @@ function processMessage(theMsg){
         console.log('no action to take',theMsg);
         return;
     }
-    console.log('tmpAction',tmpAction,theMsg.id);
+    
     if( tmpAction == 'welcome' && theMsg.id ){
         ThisPage.stage.stageid = theMsg.id;        
         if( !(ThisPage.stage.userid) ){
@@ -177,6 +177,10 @@ function processMessage(theMsg){
             //ThisPage.wsclient.send({action:'profile',}) 
         }
         console.log('ThisPage.stage.stageid',ThisPage.stage.stageid);
+        
+    } else if( tmpAction == 'chat' && theMsg.chat ){
+        
+        console.log('chat',theMsg);
         
     }
     if( theMsg.people ){
@@ -194,10 +198,25 @@ function setProfileName(theName) {
   refreshUI();
 }
 
+actions.sendChat = function() {
+    var tmpChat = ThisPage.chatInput.val();
+    if( !(tmpChat)){
+        alert('Nothing to send', "Enter some text", "e").then(function(){
+            ThisPage.chatInput.focus();
+            return;
+        })
+    }
+    ThisPage.wsclient.send(JSON.stringify({action:'chat', chat: {text:tmpChat}}))
+}
+
+
+actions.clearChat = function() {
+    ThisPage.loadSpot('chatoutput', '');   
+}
 
 actions.setYourName = function() {
-  ThisApp.input('Enter your name','Any Display Name', 'Save Display Name', ThisPage.stage.profile.name).then(setProfileName);
+ThisApp.input('Enter your name','Any Display Name', 'Save Display Name', ThisPage.stage.profile.name).then(setProfileName);
 }
-//~YourPageCode~//~
+  //~YourPageCode~//~
 
 })(ActionAppCore, $);

@@ -34,11 +34,12 @@
         </div>
 
         <div appuse="cards" group="profilestatus" item="backstage" class="hidden ui message medium green xhidden">
-          <b>Actor is backstage</b>
+          
+          <b><span pagespot="your-disp-name" class="ui bolder"></span>, you have joined the fun. To leave, close the browser tab.</b>
           <div class="pad3"></div>
-          Next step, find a character to control.
+          Next step would be to put on a costume and jump on stage, but all we have right now is chat to test joining the room and doing some basic interaction via chat.
           <div class="pad3"></div>
-          <div class="ui button green compact small" pageaction="togglePlayer">
+          <div class="hidden ui button green compact small" pageaction="togglePlayer">
             Select a character  <i class="icon right chevron"></i>
           </div>
         </div>
@@ -60,10 +61,27 @@
         </div>
       </div>
       <div tab="" appuse="cards" group="maintabs" item="chat" class="pad0  hidden ">
-        <div class="ui header medium blue">
+        <div pagespot="your-disp-name" class="ui header medium blue">
+          
+        </div>
+        
+        <div class="ui segment header black medium top attached">
           General Chat
         </div>
-        <div pagespot="gen-chat"></div>
+        <div class="ui segment attached">
+          <input pageuse="chatinput" class="ui field fluid" name="chat"/>
+          <div class="pad4"></div>
+          <div class="ui button blue compact" pageaction="sendChat">
+            Send Chat
+          </div>
+          <div class="ui button basic compact" pageaction="clearChat">
+            Clear Chat
+          </div>
+        </div>
+        <div class="ui segment attached">
+          <div pagespot="chatoutput"></div>
+        </div>
+        
       </div>
     </div>
   </div>
