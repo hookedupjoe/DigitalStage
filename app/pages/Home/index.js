@@ -19,8 +19,8 @@ var thisPageSpecs = {
 thisPageSpecs.layoutOptions = {
     baseURL: pageBaseURL,
     north: false,
-    east: { name: "welcome", control: "WelcomeCenter", "source": "__app" },
-    west: false,
+    west: { name: "welcome", control: "WelcomeCenter", "source": "__app" },
+    east: false,
     center: { html: "center" },
     south: false
 }
