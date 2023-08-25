@@ -11,36 +11,12 @@ License: MIT
 			"padding": false
 		},
 		"content": [
-			{
-				"ctl": "field",
-				"name": "TextSend",
-				"fluid": true,
-				"placeholder": "Text to send ...",
-				"content": [
-					{
-						"ctl": "button",
-						"color": "violet",
-						"icon": "right chevron",
-						"right": true,
-						"text": "Send",
-						"name": "btn-send",
-						"onClick": {
-							"run": "action",
-							"action": "runTextSend"
-						}
-					},
-					{
-						"ctl": "button",
-						"icon": "close",
-						"hidden": true,
-						"name": "btn-clear",
-						"onClick": {
-							"run": "action",
-							"action": "clearTextSend"
-						}
+		{
+						"ctl": "dropdown",
+						"list": "@everyone in the room|everyone,@Bob,@Jane",
+						"default":"everyone",
+						"name": "sendtoselect"
 					}
-				]
-			}
 		]
 	}
 

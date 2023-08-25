@@ -53,6 +53,21 @@
     this.chatControl.clearChat();
   }
 
+  ControlCode.refreshPeople = function(thePeople){
+    var tmpHTML = [];
+    var tmpActive = false;
+    for (var aID in thePeople) {
+      var tmpPerson = thePeople[aID];
+      // if (aID == this.getPage().stage.userid) {
+      //   tmpActive = true;
+      //   tmpHTML.push('* ');
+      // }
+      tmpHTML.push(tmpPerson.name + '<hr />');
+    }
+    this.loadSpot('people-list', tmpHTML.join('\n'));
+    
+    this.chatControl.refreshPeople(thePeople);
+  }
 
 
   ControlCode.openTabChat = function() {
@@ -73,7 +88,7 @@
     }).then(function(theControl){
       if( typeof(theControl) == 'object'){
          self.chatControl = theControl;
-         self.tabs.gotoTab('main');
+         //temp disable --> self.tabs.gotoTab('main');
          self.chatControl.subscribe('sendChat',onSendChat.bind(self))
       }
     });
@@ -90,7 +105,7 @@
       item: 'main',
       text: "Home",
       icon: 'home',
-      content: '<div myspot="dashhome"></div>'
+      content: '<div class="mar1 pad5" myspot="dashhome"></div>'
     });
     
     this.loadSpot('dashhome', {},  "WelcomeHome");

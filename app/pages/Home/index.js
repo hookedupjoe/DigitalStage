@@ -29,7 +29,7 @@ thisPageSpecs.layoutOptions = {
     //~layoutConfig//~
 thisPageSpecs.layoutConfig = {
         west__size: "500"
-        , east__size: "350"
+        , east__size: "450"
     }
 //~layoutConfig~//~
     //~required//~
@@ -75,8 +75,9 @@ ThisPage.stage = {
     name: sessionStorage.getItem('displayname') || ''
   }
 }
+ThisApp.stage = ThisPage.stage;
 
-//console.log('ThisPage.stage.userid',ThisPage.stage.userid);
+console.log('ThisPage.stage.userid',ThisPage.stage.userid);
 
 
 var tmpURL = ActionAppCore.util.getWebsocketURL('actions', 'ws-stage');
@@ -141,18 +142,11 @@ function sendProfile() {
 
 actions.refreshPeople = refreshPeople;
 function refreshPeople(thePeople) {
+
   ThisPage.stage.people = thePeople;
-  var tmpHTML = [];
-  var tmpActive = false;
-  for (var aID in thePeople) {
-    var tmpPerson = thePeople[aID];
-    if (aID == ThisPage.stage.userid) {
-      tmpActive = true;
-      tmpHTML.push('* ');
-    }
-    tmpHTML.push(tmpPerson.name + '<hr />');
-  }
-  ThisPage.loadSpot('people-list', tmpHTML.join('\n'));
+  //ThisPage.parts.welcome.refreshPeople(thePeople);
+  ThisPage.parts.welcome.refreshPeople(thePeople);
+
   refreshUI();
 }
 
@@ -182,9 +176,9 @@ function processMessage(theMsg) {
       }
       //ThisPage.wsclient.send({action:'profile',})
     }
-    //console.log('ThisPage.stage.stageid', ThisPage.stage.stageid);
+    console.log('ThisPage.stage.stageid', ThisPage.stage.stageid);
 
-  } else if (tmpAction == 'chat' && theMsg.chat) {
+  } else if (tmpAction == 'chat') {
 
     ThisPage.parts.welcome.gotChat(theMsg);
     // console.log('chat', theMsg);
@@ -197,7 +191,7 @@ function processMessage(theMsg) {
 
   }
   if (theMsg.people) {
-    //console.log('theMsg.people', theMsg.people);
+    console.log('theMsg.people', theMsg.people);
 
     refreshPeople(theMsg.people);
   }
@@ -208,20 +202,19 @@ function setProfileName(theName) {
   ThisPage.stage.profile = ThisPage.stage.profile || {};
   ThisPage.stage.profile.name = theName;
   sessionStorage.setItem('displayname', theName)
+  sendProfile();
   refreshUI();
 }
 
-function onSendChat(theEvent, theEl, theValue) {
-  //console.log("Page got chat", theValue)
-  if (!(theValue)) {
+function onSendChat(theEvent, theEl, theMsg) {
+  console.log("Page got chat", theMsg)
+  if (!(theMsg && theMsg.text)) {
     alert('Nothing to send', "Enter some text", "e").then(function() {
       return;
     })
   }
   ThisPage.wsclient.send(JSON.stringify({
-    action: 'chat', chat: {
-      text: theValue
-    }}))
+    action: 'chat', message: theMsg}))
 }
 
 
