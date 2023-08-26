@@ -40,8 +40,8 @@
           "ctl": "fieldrow",
           "name": "ro1",
           items: [{
-            "ctl": "dropdown",
-            "list": "Public|public,Private|private",
+            "ctl": "checkboxlist",
+            "list": "Private|private",
             "default": "public",
             "direction": "upward",
             "onChange": {
@@ -57,9 +57,15 @@
               "default": "everyone",
               "direction": "upward",
               "size": 13,
+              "onChange": {
+                "run": "onPersonSelect"
+  
+              },
               "name": "selectto"
             }]
         }]
+
+
       }],
       "center": [{
         ctl: 'spot',
@@ -90,14 +96,24 @@
   }
 
 
+
+  ControlCode.onPersonSelect = function() {
+    var tmpSelected = this.getFieldValue('selectto');
+    
+    if( (tmpSelected) ){
+      this.lastPersonSelected = tmpSelected  
+    }
+    console.log( 'onPersonSelect', this.lastPersonSelected);
+    
+  }
+  
   ControlCode.refreshPeopleList = function() {
     //--- Refresh
     var tmpPeople = this.people;
-    var tmpVis = this.getFieldValue('selectvis');
-
+    var tmpPrivate = this.getFieldValue('selectvis');
 
     var tmpList = '';
-    if (tmpVis != 'private') {
+    if (tmpPrivate != 'private') {
       tmpList = this.everyoneOption;
     }
 
@@ -118,6 +134,11 @@
       }
     }
     this.setFieldList('selectto', tmpList)
+    var tmpSel = this.lastPersonSelected;
+    if (!tmpPrivate) {
+      tmpSel = tmpSel || 'everyone';
+    }
+    this.setFieldValue('selectto',tmpSel)
   }
   ControlCode.refreshPeople = function(thePeople) {
     this.people = thePeople;
