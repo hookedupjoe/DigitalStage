@@ -179,8 +179,6 @@ function processMessage(theMsg) {
     ThisPage.parts.welcome.gotChat(theMsg);
   }
   if (theMsg.people) {
-    console.log('theMsg.people', theMsg.people);
-
     refreshPeople(theMsg.people);
   }
 
@@ -195,7 +193,6 @@ function setProfileName(theName) {
 }
 
 function onSendChat(theEvent, theEl, theMsg) {
-  console.log("Page got chat", theMsg)
   if (!(theMsg && theMsg.text)) {
     alert('Nothing to send', "Enter some text", "e").then(function() {
       return;
