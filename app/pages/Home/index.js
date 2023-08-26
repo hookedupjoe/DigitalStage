@@ -1,7 +1,9 @@
 (function (ActionAppCore, $) {
 
     var SiteMod = ActionAppCore.module("site");
+    const { RTCPeerConnection, RTCSessionDescription } = window;
 
+    
     //~thisPageSpecs//~
 var thisPageSpecs = {
         "pageName": "Home",
@@ -134,6 +136,7 @@ function refreshUI() {
 
 actions.requestMeeting = requestMeeting;
 function requestMeeting(theParams, theTarget) {
+  ThisPage.isAlreadyCalling = true;
   var tmpParams = ThisApp.getActionParams(theParams, theTarget, ['userid']);
   if(!(tmpParams.userid)){
     alert('No person selected', 'Select a person', 'e');
@@ -141,9 +144,27 @@ function requestMeeting(theParams, theTarget) {
   }
 
   console.log('send requestMeeting',tmpParams.userid)
-  ThisPage.wsclient.send(JSON.stringify({
-    action: 'meeting', to: tmpParams.userid
-  }))
+
+  //--- Quick test for one peer to peer
+  const peerConnection = new RTCPeerConnection();
+  ThisPage.activePeer = peerConnection;
+  var self = this;
+  ThisPage.activePeer.createOffer().then(theOffer => {
+    self.activeOffer = theOffer;
+    ThisPage.activePeer.setLocalDescription(new RTCSessionDescription(self.activeOffer)).then();
+
+
+    ThisPage.wsclient.send(JSON.stringify({
+      offer: this.activeOffer,
+      action: 'meeting', to: tmpParams.userid
+    }))
+
+
+  });
+  
+
+
+  
 }
 
 actions.sendProfile = sendProfile;
@@ -163,17 +184,41 @@ function refreshPeople(thePeople) {
   refreshUI();
 }
 function onMeetingRequst(theMsg){
-  console.log('theMsg',theMsg);
+  console.log('onMeetingRequst theMsg',theMsg);
   var tmpTitle = 'Meeting Request from ' + theMsg.fromname
   var tmpMsg = 'Do you want to join a meeting with ' + theMsg.fromname + '?'
+  var self = this;
   ThisApp.confirm(tmpMsg, tmpTitle).then(theReply => {
     var tmpReplyMsg = {
       from: theMsg.fromid,
       reply: theReply
     }
-    ThisPage.wsclient.send(JSON.stringify({
-      action: 'meetingresponse', message: tmpReplyMsg
-    }))
+    if( theReply ){
+      const peerConnection = new RTCPeerConnection();
+      ThisPage.activePeer = peerConnection;
+      ThisPage.activePeer.setRemoteDescription(new RTCSessionDescription(theMsg.offer)).then(
+        function () {
+
+          ThisPage.activePeer.createAnswer().then(theAnswer => {
+            self.activeAnswer = theAnswer;
+
+            ThisPage.wsclient.send(JSON.stringify({
+              action: 'meetingresponse', answer: self.activeAnswer, message: tmpReplyMsg
+            }))
+
+          });
+
+        }
+      );
+
+      
+
+    } else {
+      ThisPage.wsclient.send(JSON.stringify({
+        action: 'meetingresponse', message: tmpReplyMsg
+      }))
+    }
+   
     
   })
   
@@ -181,10 +226,30 @@ function onMeetingRequst(theMsg){
 
 function onMeetingResponse(theMsg){
   console.log('onMeetingResponse',theMsg);
+  var self = this;
+  //var theSocketID = 'todo';
   if( theMsg && theMsg.message && theMsg.message.reply === true){
-    alert('yes!')
+    //alert('yes!');
+    var tmpAnswer = theMsg.answer;
+    ThisPage.activePeer.setRemoteDescription(
+      new RTCSessionDescription(tmpAnswer)
+    ).then(function(){
+      //ToDo: Set this?
+      
+      if (!ThisPage.isAlreadyCalling) {
+        //--- Socket ID?
+        actions.requestMeeting({userid: theMsg.fromid})
+        //self.callUser(theSocketID);
+        
+      } else {
+        console.log('we have connection', typeof(ThisPage.activePeer));
+      }
+    });
+  
+    
+
   } else {
-    alert('no')
+    alert('' + theMsg.fromname + ' did not accept the requst', 'Request Not Accepted', 'e')
   }
   // var tmpTitle = 'Meeting Request from ' + theMsg.fromname
   // var tmpMsg = 'Do you want to join a meeting with ' + theMsg.fromname + '?'
