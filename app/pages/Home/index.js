@@ -94,6 +94,35 @@ ThisPage.wsclient.onmessage = function (event) {
   
 }
 
+
+ThisPage.activePeer = new RTCPeerConnection();;
+
+
+
+ThisPage.activePeer.ontrack = function({ streams: [stream] }) {
+  console.log('ontrack')
+  const remoteVideo = document.getElementById("remote-video");
+  if (remoteVideo) {
+    remoteVideo.srcObject = stream;
+  }
+};
+
+
+navigator.getUserMedia(
+  { video: true, audio: true },
+  stream => {
+    const localVideo = document.getElementById("local-video");
+    if (localVideo) {
+      localVideo.srcObject = stream;
+    }
+console.log('adding local tracks to peer');
+    stream.getTracks().forEach(track => ThisPage.activePeer.addTrack(track, stream));
+  },
+  error => {
+    console.warn(error.message);
+  }
+);
+
 refreshUI();
 //~_onFirstLoad~//~
                 ThisPage._onActivate();
@@ -136,7 +165,7 @@ function refreshUI() {
 
 actions.requestMeeting = requestMeeting;
 function requestMeeting(theParams, theTarget) {
-  ThisPage.isAlreadyCalling = true;
+  //ThisPage.isAlreadyCalling = true;
   var tmpParams = ThisApp.getActionParams(theParams, theTarget, ['userid']);
   if(!(tmpParams.userid)){
     alert('No person selected', 'Select a person', 'e');
@@ -146,16 +175,14 @@ function requestMeeting(theParams, theTarget) {
   console.log('send requestMeeting',tmpParams.userid)
 
   //--- Quick test for one peer to peer
-  const peerConnection = new RTCPeerConnection();
-  ThisPage.activePeer = peerConnection;
   var self = this;
+
   ThisPage.activePeer.createOffer().then(theOffer => {
     self.activeOffer = theOffer;
     ThisPage.activePeer.setLocalDescription(new RTCSessionDescription(self.activeOffer)).then();
 
-
     ThisPage.wsclient.send(JSON.stringify({
-      offer: this.activeOffer,
+      offer: self.activeOffer,
       action: 'meeting', to: tmpParams.userid
     }))
 
@@ -194,17 +221,21 @@ function onMeetingRequst(theMsg){
       reply: theReply
     }
     if( theReply ){
-      const peerConnection = new RTCPeerConnection();
-      ThisPage.activePeer = peerConnection;
       ThisPage.activePeer.setRemoteDescription(new RTCSessionDescription(theMsg.offer)).then(
         function () {
 
           ThisPage.activePeer.createAnswer().then(theAnswer => {
             self.activeAnswer = theAnswer;
 
-            ThisPage.wsclient.send(JSON.stringify({
-              action: 'meetingresponse', answer: self.activeAnswer, message: tmpReplyMsg
-            }))
+            ThisPage.activePeer.setLocalDescription(new RTCSessionDescription(theAnswer)).then(
+              function (){
+                ThisPage.wsclient.send(JSON.stringify({
+                  action: 'meetingresponse', answer: self.activeAnswer, message: tmpReplyMsg
+                }))
+              }
+            )
+
+            
 
           });
 
@@ -228,8 +259,15 @@ function onMeetingResponse(theMsg){
   console.log('onMeetingResponse',theMsg);
   var self = this;
   //var theSocketID = 'todo';
+  
   if( theMsg && theMsg.message && theMsg.message.reply === true){
+  
     //alert('yes!');
+
+
+    
+    
+
     var tmpAnswer = theMsg.answer;
     ThisPage.activePeer.setRemoteDescription(
       new RTCSessionDescription(tmpAnswer)
@@ -238,11 +276,15 @@ function onMeetingResponse(theMsg){
       
       if (!ThisPage.isAlreadyCalling) {
         //--- Socket ID?
+        console.log('request back');
         actions.requestMeeting({userid: theMsg.fromid})
+        ThisPage.isAlreadyCalling = true;
         //self.callUser(theSocketID);
         
       } else {
         console.log('we have connection', typeof(ThisPage.activePeer));
+
+
       }
     });
   
