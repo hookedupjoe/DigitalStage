@@ -215,7 +215,14 @@ function onMeetingRequst(theMsg){
   var tmpTitle = 'Meeting Request from ' + theMsg.fromname
   var tmpMsg = 'Do you want to join a meeting with ' + theMsg.fromname + '?'
   var self = this;
-  ThisApp.confirm(tmpMsg, tmpTitle).then(theReply => {
+
+  var tmpConfirm = true;
+
+  if( !ThisPage.inMeetingRequest ){
+    ThisPage.inMeetingRequest = true;
+    tmpConfirm = ThisApp.confirm(tmpMsg, tmpTitle);
+  }
+  $.when(tmpConfirm).then(theReply => {
     var tmpReplyMsg = {
       from: theMsg.fromid,
       reply: theReply
@@ -258,6 +265,7 @@ function onMeetingRequst(theMsg){
 function onMeetingResponse(theMsg){
   console.log('onMeetingResponse',theMsg);
   var self = this;
+  
   //var theSocketID = 'todo';
   
   if( theMsg && theMsg.message && theMsg.message.reply === true){
@@ -276,14 +284,14 @@ function onMeetingResponse(theMsg){
       
       if (!ThisPage.isAlreadyCalling) {
         //--- Socket ID?
-        console.log('request back');
+        
         actions.requestMeeting({userid: theMsg.fromid})
         ThisPage.isAlreadyCalling = true;
         //self.callUser(theSocketID);
         
       } else {
         console.log('we have connection', typeof(ThisPage.activePeer));
-
+        ThisPage.inMeetingRequest = false;
 
       }
     });
