@@ -44,8 +44,10 @@
     this.publish('sendChat', [this,theValue])
   }
   
-
-
+    
+  ControlCode.gotChat = function(theMsg){
+    this.chatControl.gotChat(theMsg)
+  }
   
   ControlCode.clearChat = function(){
     this.chatControl.clearChat();
