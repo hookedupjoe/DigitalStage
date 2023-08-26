@@ -77,8 +77,6 @@ ThisPage.stage = {
 }
 ThisApp.stage = ThisPage.stage;
 
-console.log('ThisPage.stage.userid',ThisPage.stage.userid);
-
 
 var tmpURL = ActionAppCore.util.getWebsocketURL('actions', 'ws-stage');
 ThisPage.wsclient = new WebSocket(tmpURL);
@@ -157,10 +155,10 @@ function processMessage(theMsg) {
   if (typeof(theMsg) != 'object') {
     return;
   }
-  //console.log('got', theMsg);
+
   var tmpAction = theMsg.action || theMsg.people;
   if (!(tmpAction)) {
-    console.log('no action to take', theMsg);
+    console.warn('no action to take', theMsg);
     return;
   }
 
@@ -176,19 +174,9 @@ function processMessage(theMsg) {
       }
       //ThisPage.wsclient.send({action:'profile',})
     }
-    console.log('ThisPage.stage.stageid', ThisPage.stage.stageid);
 
   } else if (tmpAction == 'chat') {
-
     ThisPage.parts.welcome.gotChat(theMsg);
-    // console.log('chat', theMsg);
-    // var tmpHTML = [];
-    // tmpHTML.push('<div class="ui message">')
-    // tmpHTML.push('<b>' + theMsg.fromname + '</b><br />')
-    // tmpHTML.push('' + theMsg.chat.text)
-    // tmpHTML.push('</div">')
-    // ThisPage.addToSpot('chatoutput', tmpHTML.join('\n'))
-
   }
   if (theMsg.people) {
     console.log('theMsg.people', theMsg.people);
@@ -216,18 +204,6 @@ function onSendChat(theEvent, theEl, theMsg) {
   ThisPage.wsclient.send(JSON.stringify({
     action: 'chat', message: theMsg}))
 }
-
-
-// actions.sendChat = function() {
-//     var tmpChat = ThisPage.chatInput.val();
-//     if( !(tmpChat)){
-//         alert('Nothing to send', "Enter some text", "e").then(function(){
-//             ThisPage.chatInput.focus();
-//             return;
-//         })
-//     }
-//     ThisPage.wsclient.send(JSON.stringify({action:'chat', chat: {text:tmpChat}}))
-// }
 
 
 actions.clearChat = function() {

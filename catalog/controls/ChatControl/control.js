@@ -36,29 +36,29 @@
         }, {
           ctl: 'div',
           classes: 'pad3'
-        },{
+        }, {
           "ctl": "fieldrow",
           "name": "ro1",
-          items:[{
-          "ctl": "dropdown",
-          "list": "Public|public,Private|private",
-          "default": "public",
-          "direction": "upward",
-					"onChange": {
-						"run": "refreshPeopleList"
-						
-					},
-          "size":5,
-          "name": "selectvis"
-        },
-        {
-          "ctl": "dropdown",
-          "list": "everyone",
-          "default": "everyone",
-          "direction": "upward",
-          "size":13,
-          "name": "selectto"
-        }]
+          items: [{
+            "ctl": "dropdown",
+            "list": "Public|public,Private|private",
+            "default": "public",
+            "direction": "upward",
+            "onChange": {
+              "run": "refreshPeopleList"
+
+            },
+            "size": 5,
+            "name": "selectvis"
+          },
+            {
+              "ctl": "dropdown",
+              "list": "everyone",
+              "default": "everyone",
+              "direction": "upward",
+              "size": 13,
+              "name": "selectto"
+            }]
         }]
       }],
       "center": [{
@@ -89,28 +89,28 @@
     return isVisible;
   }
 
-  
-  ControlCode.refreshPeopleList = function(){
+
+  ControlCode.refreshPeopleList = function() {
     //--- Refresh
     var tmpPeople = this.people;
     var tmpVis = this.getFieldValue('selectvis');
-    
-    
+
+
     var tmpList = '';
-    if( tmpVis != 'private' ){
+    if (tmpVis != 'private') {
       tmpList = this.everyoneOption;
     }
-    
-    if( !(ThisApp.stage && ThisApp.stage.userid) ){
+
+    if (!(ThisApp.stage && ThisApp.stage.userid)) {
       return;
     }
-    var tmpUserID = ThisApp.stage.userid;//this.getParentPage().stage.userid;
-    
-    for( var aID in tmpPeople ){
+    var tmpUserID = ThisApp.stage.userid; //this.getParentPage().stage.userid;
+
+    for (var aID in tmpPeople) {
       var tmpPerson = tmpPeople[aID];
-      if( tmpUserID != aID ){
-        if( tmpPerson && tmpPerson.name ){
-          if( tmpList ){
+      if (tmpUserID != aID) {
+        if (tmpPerson && tmpPerson.name) {
+          if (tmpList) {
             tmpList += ',';
           }
           tmpList += '@' + tmpPerson.name + "|" + aID;
@@ -118,37 +118,33 @@
       }
     }
     this.setFieldList('selectto', tmpList)
-    console.log('update dropdown',tmpPeople)
   }
-  ControlCode.refreshPeople = function(thePeople){
+  ControlCode.refreshPeople = function(thePeople) {
     this.people = thePeople;
     this.refreshPeopleList();
   }
-  
+
   ControlCode.gotChat = function(theChat) {
-  console.log('theChat',theChat);
-  var tmpMsg = theChat.message;
-  var tmpText = tmpMsg.text;
-  var tmpTo = tmpMsg.to;
-  var tmpVis = tmpMsg.vis;
-  var tmpToName = theChat.toname;
-  var tmpColor = 'blue';
-  var tmpNameColor ='blue';
-  if( tmpVis == 'private'){
-    tmpColor = 'grey';
-    tmpNameColor = 'black'
-  }
-  console.log( 'tmpVis', tmpVis, 'color', tmpColor);
-  
-  
+    var tmpMsg = theChat.message;
+    var tmpText = tmpMsg.text;
+    var tmpTo = tmpMsg.to;
+    var tmpVis = tmpMsg.vis;
+    var tmpToName = theChat.toname;
+    var tmpColor = 'blue';
+    var tmpNameColor = 'blue';
+    if (tmpVis == 'private') {
+      tmpColor = 'grey';
+      tmpNameColor = 'black'
+    }
+
+
     this.chatNumber = this.chatNumber || 0;
     this.chatNumber++;
 
     var tmpNewChat = `<div class="ui message `+ tmpColor +` mar0 pad3" chatcount="` + this.chatNumber + `">
     <div class="ui label right pointing ` + tmpNameColor + ` basic">` + theChat.fromname + `</div>`;
-    
-    console.log('tmpToName',tmpToName);
-    if( tmpToName ){
+
+    if (tmpToName) {
       tmpNewChat += `<div class="ui label basic">@` + tmpToName + `</div> `
     }
     tmpNewChat += tmpText + `</div>`;
@@ -187,12 +183,11 @@
     var self = this;
     //this.page = this.getParentPage();
     //this.stage = this.page.stage;
-    //console.log('this.stage',this.stage)
     // this.userid = this.stage.userid;
-    
+
     this.everyoneOption = "@ The Room|everyone";
-    this.setFieldList('selectto',this.everyoneOption);
-    
+    this.setFieldList('selectto', this.everyoneOption);
+
     this.parts.sendbar.subscribe('send', function(theEvent, theControl, theValue) {
       var tmpMsg = {
         vis: self.getFieldValue('selectvis'),
