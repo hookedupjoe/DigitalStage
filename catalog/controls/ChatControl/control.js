@@ -132,13 +132,20 @@
   var tmpTo = tmpMsg.to;
   var tmpVis = tmpMsg.vis;
   var tmpToName = theChat.toname;
+  var tmpColor = 'blue';
+  var tmpNameColor ='blue';
+  if( tmpVis == 'private'){
+    tmpColor = 'grey';
+    tmpNameColor = 'black'
+  }
+  console.log( 'tmpVis', tmpVis, 'color', tmpColor);
   
   
     this.chatNumber = this.chatNumber || 0;
     this.chatNumber++;
 
-    var tmpNewChat = `<div class="ui message mar0 pad3" chatcount="` + this.chatNumber + `">
-    <div class="ui label right pointing blue basic">` + theChat.fromname + `</div>`;
+    var tmpNewChat = `<div class="ui message `+ tmpColor +` mar0 pad3" chatcount="` + this.chatNumber + `">
+    <div class="ui label right pointing ` + tmpNameColor + ` basic">` + theChat.fromname + `</div>`;
     
     console.log('tmpToName',tmpToName);
     if( tmpToName ){
