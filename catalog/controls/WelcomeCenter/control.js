@@ -44,28 +44,32 @@
     this.publish('sendChat', [this,theValue])
   }
   
-    
-  ControlCode.gotChat = function(theMsg){
-    this.chatControl.gotChat(theMsg)
-  }
+
+
   
   ControlCode.clearChat = function(){
     this.chatControl.clearChat();
   }
 
   ControlCode.refreshPeople = function(thePeople){
+    console.log( 'thePeople', thePeople);
+    
     var tmpHTML = [];
     var tmpActive = false;
+    
     for (var aID in thePeople) {
       var tmpPerson = thePeople[aID];
-      // if (aID == this.getPage().stage.userid) {
-      //   tmpActive = true;
-      //   tmpHTML.push('* ');
-      // }
-      tmpHTML.push(tmpPerson.name + '<hr />');
+      tmpHTML.push('<div class="ui message">')
+      tmpHTML.push(tmpPerson.name);
+      if( this.page.stage.userid != tmpPerson.userid ){
+        tmpHTML.push('<div  userid="' + aID + '" pageaction="requestMeeting" class="ui button blue compact small toright">Request Meeting</div>');
+      }
+      tmpHTML.push('<div class="clearboth"></div>')
+      
+      tmpHTML.push('</div>')
     }
-    this.loadSpot('people-list', tmpHTML.join('\n'));
     
+    this.loadSpot('people-list', tmpHTML.join('\n'));
     this.chatControl.refreshPeople(thePeople);
   }
 
@@ -88,7 +92,8 @@
     }).then(function(theControl){
       if( typeof(theControl) == 'object'){
          self.chatControl = theControl;
-         //temp disable --> self.tabs.gotoTab('main');
+         //temp disable --> below
+         self.tabs.gotoTab('main');
          self.chatControl.subscribe('sendChat',onSendChat.bind(self))
       }
     });
@@ -99,7 +104,7 @@
   ControlCode._onInit = _onInit;
   function _onInit() {
     this.parts.header.setHeader('Stage Entrance');
-
+    this.page = this.getParentPage();
     this.tabs = this.parts.tabs;
     this.tabs.addTab({
       item: 'main',

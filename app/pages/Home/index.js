@@ -131,6 +131,21 @@ function refreshUI() {
 
 }
 
+
+actions.requestMeeting = requestMeeting;
+function requestMeeting(theParams, theTarget) {
+  var tmpParams = ThisApp.getActionParams(theParams, theTarget, ['userid']);
+  if(!(tmpParams.userid)){
+    alert('No person selected', 'Select a person', 'e');
+    return;
+  }
+
+  console.log('send requestMeeting',tmpParams.userid)
+  ThisPage.wsclient.send(JSON.stringify({
+    action: 'meeting', to: tmpParams.userid
+  }))
+}
+
 actions.sendProfile = sendProfile;
 function sendProfile() {
   ThisPage.wsclient.send(JSON.stringify({
@@ -146,6 +161,44 @@ function refreshPeople(thePeople) {
   ThisPage.parts.welcome.refreshPeople(thePeople);
 
   refreshUI();
+}
+function onMeetingRequst(theMsg){
+  console.log('theMsg',theMsg);
+  var tmpTitle = 'Meeting Request from ' + theMsg.fromname
+  var tmpMsg = 'Do you want to join a meeting with ' + theMsg.fromname + '?'
+  ThisApp.confirm(tmpMsg, tmpTitle).then(theReply => {
+    var tmpReplyMsg = {
+      from: theMsg.fromid,
+      reply: theReply
+    }
+    ThisPage.wsclient.send(JSON.stringify({
+      action: 'meetingresponse', message: tmpReplyMsg
+    }))
+    
+  })
+  
+}
+
+function onMeetingResponse(theMsg){
+  console.log('onMeetingResponse',theMsg);
+  if( theMsg && theMsg.message && theMsg.message.reply === true){
+    alert('yes!')
+  } else {
+    alert('no')
+  }
+  // var tmpTitle = 'Meeting Request from ' + theMsg.fromname
+  // var tmpMsg = 'Do you want to join a meeting with ' + theMsg.fromname + '?'
+  // ThisApp.confirm(tmpMsg, tmpTitle).then(theReply => {
+  //   var tmpReplyMsg = {
+  //     from: theMsg.fromid,
+  //     reply: theReply
+  //   }
+  //   ThisPage.wsclient.send(JSON.stringify({
+  //     action: 'meetingresponse', message: tmpReplyMsg
+  //   }))
+    
+  // })
+  
 }
 
 function processMessage(theMsg) {
@@ -177,6 +230,12 @@ function processMessage(theMsg) {
 
   } else if (tmpAction == 'chat') {
     ThisPage.parts.welcome.gotChat(theMsg);
+  } else if (tmpAction == 'meetingrequest') {
+    onMeetingRequst(theMsg);
+  } else if (tmpAction == 'meetingresponse') {
+    onMeetingResponse(theMsg);
+  } else {
+    console.log('unknown message', theMsg);
   }
   if (theMsg.people) {
     refreshPeople(theMsg.people);
@@ -192,15 +251,16 @@ function setProfileName(theName) {
   refreshUI();
 }
 
-function onSendChat(theEvent, theEl, theMsg) {
-  if (!(theMsg && theMsg.text)) {
-    alert('Nothing to send', "Enter some text", "e").then(function() {
-      return;
-    })
+  function onSendChat(theEvent, theEl, theMsg) {
+    if (!(theMsg && theMsg.text)) {
+      alert('Nothing to send', "Enter some text", "e").then(function () {
+        return;
+      })
+    }
+    ThisPage.wsclient.send(JSON.stringify({
+      action: 'chat', message: theMsg
+    }))
   }
-  ThisPage.wsclient.send(JSON.stringify({
-    action: 'chat', message: theMsg}))
-}
 
 
 actions.clearChat = function() {
