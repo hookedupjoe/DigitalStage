@@ -1,90 +1,29 @@
+<div class="mar2">
 <div class="ui segment basic slim">
-  <div class="ui form">
-    <div item="pagetabs" class="mar0 pad0 ui top attached tabular menu ">
-      <a appuse="tablinks" group="maintabs" item="people" pageaction="showSubPage" class="item blue active ">People</a>
-      <a appuse="tablinks" group="maintabs" item="chat" pageaction="showSubPage" class="item blue">Chat</a>
+<video style="width:100%;max-width:350px;border:solid 1px blue;" autoplay muted class="local-video" id="local-video"></video>
+</div>
+        <div class="ui button blue basic" pageaction="refreshMediaSources">
+          Refresh Source List
+        </div>
+        <div class="pad3"></div>
+  <div class="ui segment attached basic pad0 mar0">
+    <div class="mar0 pad0 ui top attached tabular menu">
+      <a appuse="tablinks" group="inputtabs" item="maintab1" pageaction="showSubPage" class="item blue active ">Audio</a>
+      <a appuse="tablinks" group="inputtabs" item="maintab2" pageaction="showSubPage" class="item blue">Video</a>
     </div>
     <div class=" ui  bottom attached slim blue segment   ">
-      <div tab="" appuse="cards" group="maintabs" item="people" class="pad0 ">
-        
-        <div appuse="cards" group="profilestatus" item="new" class="ui message medium blue">
-          Welcome, to join the fun, enter a display name and join in.
-          <div class="pad5"></div>
-          <div class="ui button blue small compact" pageaction="setYourName">
-            Set Display Name
-          </div>
-        </div>
+      <div appuse="cards" group="inputtabs" item="maintab1" class="pad0 ">
+                <div pagespot="audio-sources"></div>
 
-        <div appuse="cards" group="profilestatus" item="outside" class="hidden ui message medium">
-          <b>Welcome</b>
-          <div class="pad3"></div>
-          <div pagespot="your-disp-name" class="ui header medium black">
-            (none)
-          </div>
-          <div class="pad3"></div>
-          Welcome, you can can join the fun anytime.
-          <div class="pad3"></div>
-          <div class="ui button yellow compact small" pageaction="sendProfile">
-            Join the fun <i class="icon right chevron"></i>
-          </div>
-          <div class="pad3"></div>
-          <div class="ui button basic small compact" pageaction="setYourName">
-            Change Display Name
-          </div>
-        </div>
-
-        <div appuse="cards" group="profilestatus" item="backstage" class="hidden ui message medium green xhidden">
-          
-          <b><span pagespot="your-disp-name" class="ui bolder"></span>, you have joined the fun. To leave, close the browser tab.</b>
-          <div class="pad3"></div>
-          Next step would be to put on a costume and jump on stage, but all we have right now is chat to test joining the room and doing some basic interaction via chat.
-          <div class="pad3"></div>
-          <div class="hidden ui button green compact small" pageaction="togglePlayer">
-            Select a character  <i class="icon right chevron"></i>
-          </div>
-        </div>
-
-
-        <div class="ui header medium blue center aligned top attached">
-          Everyone that is here
-        </div>
-
-        <div class="ui segment attached hidden">
-          <div class="ui button blue basic compact small" pageaction="refreshPeople">
-            <i class="icon recycle"></i> Refresh
-          </div>
-        </div>
-        <div class="ui segment attached">
-          <div pagespot="people-list">
-            (no one is here)
-          </div>
-        </div>
       </div>
-      <div tab="" appuse="cards" group="maintabs" item="chat" class="pad0  hidden ">
-        <div pagespot="your-disp-name" class="ui header medium blue">
-          
-        </div>
-        
-        <div class="ui segment header black medium top attached">
-          General Chat
-        </div>
-        <div class="ui segment attached">
-          <input pageuse="chatinput" class="ui field fluid" name="chat"/>
-          <div class="pad4"></div>
-          <div class="ui button blue compact" pageaction="sendChat">
-            Send Chat
-          </div>
-          <div class="ui button basic compact" pageaction="clearChat">
-            Clear Chat
-          </div>
-        </div>
-        <div class="ui segment attached">
-          <div pagespot="chatoutput"></div>
-        </div>
-        
+      <div appuse="cards" group="inputtabs" item="maintab2" class="pad0  hidden ">
+        <div pagespot="video-sources"></div>
+
       </div>
     </div>
+
   </div>
 
 
 </div>
+

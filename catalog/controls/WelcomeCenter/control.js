@@ -35,6 +35,15 @@
 
   var ControlCode = {};
 
+  ControlCode.refreshMediaSources = refreshMediaSources;
+  function refreshMediaSources() {
+    var self = this;
+    navigator.mediaDevices.enumerateDevices().then(function(theDevices){
+        self.mediaInfo.devices = theDevices;
+        self.publish('NewMediaSources')
+    });
+  }
+  
   ControlCode.setup = setup;
   function setup() {
     
@@ -105,6 +114,7 @@
 
   ControlCode._onInit = _onInit;
   function _onInit() {
+    this.mediaInfo = {};
     this.parts.header.setHeader('Stage Entrance');
     this.page = this.getParentPage();
     this.tabs = this.parts.tabs;
@@ -117,6 +127,8 @@
     
     this.loadSpot('dashhome', {},  "WelcomeHome");
     this.openTabChat();
+    
+    
     
     
 
