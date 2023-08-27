@@ -167,7 +167,7 @@ function selectAudioSource(theParams, theTarget) {
   ThisApp.currentAudioDeviceID = tmpParams.deviceId;
   console.log('ThisApp.currentAudioDeviceID',ThisApp.currentAudioDeviceID);
 
-  var tmpConstraints = { video: true, audio: true, deviceId: {
+  var tmpConstraints = { video: false, audio: true, deviceId: {
       exact: [ThisApp.currentAudioDeviceID]
     }};
   
@@ -175,9 +175,9 @@ function selectAudioSource(theParams, theTarget) {
   navigator.getUserMedia(
     tmpConstraints,
     stream => {
-      const localVideo = document.getElementById("local-video");
-      if (localVideo) {
-        localVideo.srcObject = stream;
+      const localSource = document.getElementById("local-audio");
+      if (localSource) {
+        localSource.srcObject = stream;
       }
   console.log('adding local tracks to peer');
       stream.getTracks().forEach(track => ThisPage.activePeer.addTrack(track, stream));
