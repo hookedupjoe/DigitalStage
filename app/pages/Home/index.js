@@ -147,6 +147,20 @@ refreshUI();
 
     //------- --------  --------  --------  --------  --------  --------  -------- 
     //~YourPageCode//~
+function promptForCamera(){
+  
+  navigator.getUserMedia(
+  { video: true, audio: true },
+  stream => {
+      //--- Do nothing, just validating / prompting for cameral use
+  },
+  error => {
+    console.warn(error.message);
+  }
+);
+
+}
+
 actions.selectAudioSource = selectAudioSource;
 function selectAudioSource(theParams, theTarget) {
   var tmpParams = ThisApp.getActionParams(theParams, theTarget, ['deviceId', 'label']);
@@ -212,6 +226,7 @@ console.log('tmpConstraints',tmpConstraints);
 
 actions.refreshMediaSources = refreshMediaSources;
 function refreshMediaSources() {
+  promptForCamera();
   ThisPage.parts.welcome.refreshMediaSources();
 }
 
@@ -268,6 +283,7 @@ function refreshAudioMediaSources() {
 function refreshVideoMediaSources() {
 
   var tmpDevices = ThisPage.parts.welcome.mediaInfo.devices;
+  console.log('tmpDevices',tmpDevices);
 
   var tmpHTML = ['<div class="ui vertical menu fluid">'];
 
