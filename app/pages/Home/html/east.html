@@ -1,11 +1,19 @@
 <div class="mar2">
-<div class="ui segment basic slim">
-<video style="width:100%;max-width:350px;border:solid 1px blue;" autoplay muted class="local-video" id="local-video"></video>
-</div>
+
+  <div class="ui header large blue center aligned">
+    My Video
+  </div>
+  
+<video style="width:100%;border:solid 2px #ccc;" autoplay muted class="local-video" id="local-video"></video>
+<div class="pad3"></div>
         <div class="ui button blue basic" pageaction="refreshMediaSources">
           Refresh Video Sources
         </div>
-        <div class="pad3"></div>
+        <div class="ui message">
+          Click a video source below, it will show in the window above.  That is what the other person will see in the meeting. 
+          <br />
+          Note: You can join and view without sharing video or audio.
+        </div>
         <div pagespot="video-sources"></div>
         
 <div class="ui hidden">
