@@ -118,7 +118,7 @@
   ControlCode._onInit = _onInit;
   function _onInit() {
     this.mediaInfo = {};
-    this.parts.header.setHeader('Stage Entrance');
+    this.parts.header.setHeader('Meeting Attendees');
     this.page = this.getParentPage();
     this.tabs = this.parts.tabs;
     this.tabs.addTab({

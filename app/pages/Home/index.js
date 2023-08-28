@@ -69,7 +69,7 @@ ThisPage.parts.welcome.subscribe('sendChat', onSendChat)
 ThisPage.chatInput = ThisPage.getByAttr$({pageuse:"chatinput"})
 
 ThisPage.stage = {
-  name: "The Fun Stage",
+  name: "MeetingCenter",
   userid: sessionStorage.getItem('userid') || '',
   profile: {
     name: sessionStorage.getItem('displayname') || ''
@@ -115,23 +115,6 @@ ThisPage.activePeer.ontrack = function({ streams: [stream] }) {
   }
 };
 
-
-// navigator.getUserMedia(
-//   { video: true, audio: true },
-//   stream => {
-//     const localVideo = document.getElementById("local-video");
-//     if (localVideo) {
-//       localVideo.srcObject = stream;
-//     }
-// console.log('adding local tracks to peer');
-//     stream.getTracks().forEach(track => ThisPage.activePeer.addTrack(track, stream));
-//   },
-//   error => {
-//     console.warn(error.message);
-//   }
-// );
-
-
 ThisPage.parts.welcome.subscribe('NewMediaSources', refreshMediaSourceLists)
 ThisPage.parts.welcome.refreshMediaSources();
         
@@ -157,8 +140,7 @@ refreshUI();
 
     //------- --------  --------  --------  --------  --------  --------  -------- 
     //~YourPageCode//~
-
-    var sendChannel;
+var sendChannel;
 
 function promptForCamera(){
   
