@@ -63,7 +63,7 @@
   }
 
   ControlCode.refreshPeople = function(thePeople){
-    console.log( 'thePeople', thePeople);
+    //console.log( 'thePeople', thePeople);
     
     var tmpHTML = [];
     var tmpActive = false;
@@ -71,12 +71,15 @@
     for (var aID in thePeople) {
       var tmpPerson = thePeople[aID];
       tmpHTML.push('<div class="ui message">')
+      tmpHTML.push('<div class="ui header small toleft">')
       tmpHTML.push(tmpPerson.name);
+      tmpHTML.push('</div>')
+
       if( this.page.stage.userid != tmpPerson.userid ){
         tmpHTML.push('<div  userid="' + aID + '" pageaction="requestMeeting" class="ui button blue compact small toright">Request Meeting</div>');
       }
-      tmpHTML.push('<div class="clearboth"></div>')
       
+      tmpHTML.push('<div class="clearboth"></div>')
       tmpHTML.push('</div>')
     }
     

@@ -95,6 +95,16 @@ ThisPage.wsclient.onmessage = function (event) {
 
 ThisPage.activePeer = new RTCPeerConnection();;
 
+ThisPage.activePeer.addEventListener('datachannel', event => {
+  ThisPage.activeDataChannel = event.channel;
+  console.log('got datachannel',event.channel);
+})
+
+ThisPage.localSendChannel = ThisPage.activePeer.createDataChannel("sendChannel");
+ThisPage.localSendChannel.onopen = handleSendChannelStatusChange;
+ThisPage.localSendChannel.onclose = handleSendChannelStatusChange;
+ThisPage.localSendChannel.onmessage = onChannelMessage
+
 
 
 ThisPage.activePeer.ontrack = function({ streams: [stream] }) {
@@ -147,6 +157,9 @@ refreshUI();
 
     //------- --------  --------  --------  --------  --------  --------  -------- 
     //~YourPageCode//~
+
+    var sendChannel;
+
 function promptForCamera(){
   
   navigator.getUserMedia(
@@ -283,7 +296,7 @@ function refreshAudioMediaSources() {
 function refreshVideoMediaSources() {
 
   var tmpDevices = ThisPage.parts.welcome.mediaInfo.devices;
-  console.log('tmpDevices',tmpDevices);
+  //console.log('tmpDevices',tmpDevices);
 
   var tmpHTML = ['<div class="ui vertical menu fluid">'];
 
@@ -341,6 +354,32 @@ function refreshUI() {
 }
 
 
+
+
+function onChannelMessage(event) {
+  console.log('onChannelMessage',event)
+}
+function handleSendChannelStatusChange(event) {
+  console.log('handleSendChannelStatusChange',event)
+  if (sendChannel) {
+    var state = sendChannel.readyState;
+    console.log('handleSendChannelStatusChange state',state);
+  }
+}
+
+actions.requestDataConnect = requestDataConnect;
+function requestDataConnect(theParams, theTarget) {
+  var tmpParams = ThisApp.getActionParams(theParams, theTarget, ['userid']);
+  if (!(tmpParams.userid)) {
+    alert('No person selected', 'Select a person', 'e');
+    return;
+  }
+  console.log('requestDataConnect', tmpParams.userid);
+
+   
+  
+}
+
 actions.requestMeeting = requestMeeting;
 function requestMeeting(theParams, theTarget) {
   //ThisPage.isAlreadyCalling = true;
@@ -350,7 +389,7 @@ function requestMeeting(theParams, theTarget) {
     return;
   }
 
-  console.log('send requestMeeting', tmpParams.userid)
+  //console.log('send requestMeeting', tmpParams.userid)
 
   //--- Quick test for one peer to peer
   var self = this;
@@ -387,8 +426,15 @@ function refreshPeople(thePeople) {
   refreshUI();
 }
 
+
+function onPeopleList(theMsg) {
+  if( theMsg && theMsg.people){
+    refreshPeople(theMsg.people);
+  }
+  
+}
 function onMeetingRequst(theMsg) {
-  console.log('onMeetingRequst theMsg', theMsg);
+  //console.log('onMeetingRequst theMsg', theMsg);
   var tmpTitle = 'Meeting Request from ' + theMsg.fromname
   var tmpMsg = 'Do you want to join a meeting with ' + theMsg.fromname + '?'
   var self = this;
@@ -438,10 +484,23 @@ function onMeetingRequst(theMsg) {
   })
 
 }
+var receiveChannel;
+
+function handleReceiveMessage(event) {
+  console.log('handleReceiveMessage',event.data)
+}
+
+function receiveChannelCallback(event) {
+  receiveChannel = event.channel;
+  receiveChannel.onmessage = handleReceiveMessage;
+  console.log('receiveChannelCallback',typeof(event.channel))
+  
+  //receiveChannel.onopen = handleReceiveChannelStatusChange;
+  //receiveChannel.onclose = handleReceiveChannelStatusChange;
+}
 
 function onMeetingResponse(theMsg) {
-  console.log('onMeetingResponse',
-    theMsg);
+  //console.log('onMeetingResponse',theMsg);
   var self = this;
 
   //var theSocketID = 'todo';
@@ -470,8 +529,11 @@ function onMeetingResponse(theMsg) {
           //self.callUser(theSocketID);
 
         } else {
-          console.log('we have connection', typeof(ThisPage.activePeer));
+          //console.log('we have connection', typeof(ThisPage.activePeer));
           ThisPage.inMeetingRequest = false;
+
+
+
 
         }
       });
@@ -527,6 +589,8 @@ function processMessage(theMsg) {
     ThisPage.parts.welcome.gotChat(theMsg);
   } else if (tmpAction == 'meetingrequest') {
     onMeetingRequst(theMsg);
+  } else if (tmpAction == 'people') {
+    onPeopleList(theMsg);
   } else if (tmpAction == 'meetingresponse') {
     onMeetingResponse(theMsg);
   } else {

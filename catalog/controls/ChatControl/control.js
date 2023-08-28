@@ -103,7 +103,7 @@
     if( (tmpSelected) ){
       this.lastPersonSelected = tmpSelected  
     }
-    console.log( 'onPersonSelect', this.lastPersonSelected);
+    //console.log( 'onPersonSelect', this.lastPersonSelected);
     
   }
   
